@@ -1,7 +1,10 @@
 when defined(use_proc):
   # This works when x1 is defined as a proc
-  proc x1(name: string) =
+  proc x1(name: string, v: uint32) =
     var hi, lo: uint32
+
+    hi = 0
+    lo = v
 
     asm """
       rdtsc
@@ -16,8 +19,11 @@ else:
   # The problem is that the asm code is generated at
   # the top level without being inside of a subroutine.
   # See line 21 of nimcache/test_asm.c.
-  template x1(name: string) =
+  template x1(name: string, v: uint32) =
     var hi, lo: uint32
+
+    hi = 0
+    lo = v
 
     asm """
       rdtsc
@@ -28,4 +34,7 @@ else:
     echo name, " cycles=", cycles
 
 when isMainModule:
-  x1("hi")
+  proc myproc() =
+    x1("ok1", 1)
+
+  myproc()
